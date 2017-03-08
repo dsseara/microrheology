@@ -1,5 +1,26 @@
 % This script runs Maria Kilfoil's Matlab tools for feature finding, particle tracking
 %
+% Requires two structs for feature finding (ffparams) and for tracking (trackparams)
+% 
+%     ffparams. 
+%              featsize  = Radius of features in pixels (integer)
+%              barint    = Minimum integrated intensity to be accepted
+%              barrg     = Maximum radius of gyration squared to be accepted in pixels squared
+%              barcc     = Maximum eccentricity to be accepted
+%              IdivRg    = Minimum ratio of integrated intensity to radius of gyration squared to be accepted
+%              Imin      = Minimum intensity of local maximum to be considered (set to 0 for default of top 30%)
+%              masscut   = Parameter which defines threshold for integrated intensity before position refinement (optional, set to skip
+%              fovn      = Field of view are you using to optimize feature finding
+%              numframes = Total number of frames
+%              numFOV    = Number of fields of view for the data
+%              frame     = Frame in that fov you are using to optimize (i.e., if fovn = 1 and frame = 3, will look at image fov1_0003.tif)
+%              field     = Enter 0 or 1 if the frame is one field of an interlaced video frame, and 2 if it is a full frame
+%
+% trackparams.
+%             featsize   = Same as ffparams.featsize
+%             maxdisp    = Maximum displacement in pixels a feature may undergo between successive frames (default 2)
+%             goodenough = Minimum length for a trajectory to be retained (default 100)
+%             memory     = Maximum number of frames a feature is allowed to skip (default 1)
 % You can find all the software and the instructions that this script follows to a T at:
 % http://people.umass.edu/kilfoil/downloads.html
 %
@@ -8,30 +29,14 @@
 basepath = input('Enter the path to the experimental data \n (make sure it ends with the appropriate slash, pwd won"t work): ');
 cd(basepath);
 fprintf('\n Within the path you entered above, there should be folders called "fov#", \n and the frames of the movie are expected to be named "fov#_####.tif". \n' )
-numFOV = input('Enter the number of fields of view for the data: ');
-for i=1:numFOV
+
+for i=1:ffparams.numFOV
     time = input('Enter a vector of times for the frames: ');
     save(sprintf('fov%i_times',i),'time');
 end
 
 %%
-% Now input the parameters to be used for feature finding \n in a struct called ffparams (we will be editting these until we get something acceptable). The first seven are editted by hand before moving on.
-
-disp('Enter feature finding parameters...')
-
-ffparams.featsize  = input('featsize: Radius of features in pixels (integer): ');
-ffparams.barint    = input('barint: Minimum integrated intensity to be accepted: ');
-ffparams.barrg     = input('barrg: Maximum radius of gyration squared to be accepted in pixels squared: ');
-ffparams.barcc     = input('barcc: Maximum eccentricity to be accepted: ');
-ffparams.IdivRg    = input('IdivRg: Minimum ratio of integrated intensity to radius of gyration squared to be accepted: ');
-ffparams.Imin      = input('Imin: Minimum intensity of local maximum to be considered (set to 0 for default of top 30%): ');
-ffparams.masscut   = input('masscut: Parameter which defines threshold for integrated intensity before position refinement (optional, set to 0 to skip): ');
-
-ffparams.fovn      = input('fovn: Which field of view are you using to optimize feature finding: ');
-ffparams.numframes = input('numframes: Total number of frames: ');
-ffparams.frame     = input('frame: Which frame in that fov you are using to optimize (i.e., if fovn = 1 and frame = 3, will look at image fov1/fov1_0003.tif): ');
-ffparams.field     = input('field: Enter 0 or 1 if the frame is one field of an interlaced video frame, and 2 if it is a full frame: ');
-
+% Run the feature finding initial step, optimize parameters until satisfied
 disp('Open up the image you want to optimize with in ImageJ')
 pause(1);
 
@@ -47,7 +52,7 @@ while moveOn == 0
 end
 
 disp('Finding features...')
-for ii=1:numFOV
+for ii=1:ffparams.numFOV
     mpretrack( basepath, ii, ffparams.featsize, ffparams.barint, ffparams.barrg, ffparams.barcc, ffparams.IdivRg, ffparams.numframes,ffparams.Imin, ffparams.masscut, ffparams.field );
 end
 disp('Done.')
@@ -60,15 +65,8 @@ end
 
 %% 
 % Now we do the particle tracking, saving the parameters used in a struct called trackparams
-
-disp('Enter tracking parameters')
-trackparams.featsize   = ffparams.featsize;
-trackparams.maxdisp    = input('maxdisp: Maximum displacement in pixels a feature may undergo between successive frames (default 2): ');
-trackparams.goodenough = input('goodenough: Minimum length for a trajectory to be retained (default 100): ');
-trackparams.memory     = input('memory: Maximum number of frames a feature is allowed to skip (default 1): ');
-
 disp('Tracking...')
-for jj = 1:numFOV
+for jj = 1:ffparams.numFOV
     fancytrack(basepath, jj, trackparams.featsize, trackparams.maxdisp, trackparams.goodenough, trackparams.memory );
 end
 disp('Done.')

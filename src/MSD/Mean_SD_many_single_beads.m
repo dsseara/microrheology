@@ -1,4 +1,4 @@
-function [msd, tau] = Mean_SD_many_single_beads(path, timeint, number_of_frames,rg_cutoff, tc)
+function [msd, msdx, msdy, tau, beadcount] = Mean_SD_many_single_beads(path, timeint, number_of_frames,rg_cutoff, tc)
 
 % This program calculates the mean squared displacement for all beads at 
 % all possible lag times from 1 to number_of_frames. The result is the sum
@@ -32,11 +32,6 @@ elseif isunix
     load([path 'Bead_Tracking/ddposum_files/individual_beads/correspondance_RG'])
 end
 
-
-
-msdpath = '1pt_msd';
-[status, message, messageid] = mkdir([path msdpath]);
-
 if isempty(tc)
     tau=[timeint:timeint:(number_of_frames-1)*timeint]';
     msd=zeros(number_of_frames-1,1);
@@ -61,6 +56,10 @@ else
     msd.post=zeros(post_number_of_frames-1,1);
     msdx.post=zeros(post_number_of_frames-1,1);
     msdy.post=zeros(post_number_of_frames-1,1);
+end
+
+if isempty(rg_cutoff)
+    rg_cutoff = max(correspondance(:,4)) + 1;
 end
 
 beadcount = 0;
@@ -162,21 +161,16 @@ for i = 1:length(correspondance(:,1))
     end
 end
 
+
 %howmanyPoints=numbeads*(number_of_frames-(1:number_of_frames-1))';
 if isempty(tc)
     msd=msd./pointtracer;
     msdx=msdx./pointtracer;
     msdy=msdy./pointtracer;
-    if ispc
-        save([path msdpath '\msd_of_'  num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msd' ,'tau')
-        save([path msdpath '\msdx_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdx','tau')
-        save([path msdpath '\msdy_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdy','tau')
-    elseif isunix
-        save([path msdpath '/msd_of_'  num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msd' ,'tau')
-        save([path msdpath '/msdx_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdx','tau')
-        save([path msdpath '/msdy_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdy','tau')
-    end
+
+    % save([saveTo 'wholeSeries_output'],'msd', 'msdx', 'msdy', 'tau')
 else
+
     %%% Pre tc in first field %%%
     msd.pre =msd.pre ./pre_pointtracer;
     msdx.pre=msdx.pre./pre_pointtracer;
@@ -186,13 +180,6 @@ else
     msd.post =msd.post ./post_pointtracer;
     msdx.post=msdx.post./post_pointtracer;
     msdy.post=msdy.post./post_pointtracer;
-    if ispc
-        save([path msdpath '\msd_of_'  num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msd' ,'tau')
-        save([path msdpath '\msdx_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdx','tau')
-        save([path msdpath '\msdy_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdy','tau')
-    elseif isunix
-        save([path msdpath '/msd_of_'  num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msd' ,'tau')
-        save([path msdpath '/msdx_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdx','tau')
-        save([path msdpath '/msdy_of_' num2str(beadcount) '_beads_rgcutoff_' num2str(rg_cutoff*1000) 'nm'],'msdy','tau')
-    end
+
+    % save([saveTo 'tcFrame_' num2str(tc) '_output'], 'msd','msdx', 'msdy', 'tau')
 end

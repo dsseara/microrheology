@@ -13,6 +13,7 @@ function [msd, msdx, msdy, tau, beadcount] = Mean_SD_many_single_beads(path, tim
 %          timeint - the (average) delta-t between frames, in seconds
 % number_of_frames - maximum lag time to consider (typically number of 
 %                    frames recorded per FOV).
+%        rg_cutoff - [min max] of radius of gyration to use
 %               tc - (optional) critical time (as a frame number) to calculate msd
 %                    both before and after is set 
 %
@@ -24,6 +25,7 @@ function [msd, msdx, msdy, tau, beadcount] = Mean_SD_many_single_beads(path, tim
 % msd - a vector containing the msd in micrometer squared for each lag time tau
 % tau - a vector of each lag time tau, in seconds
 %
+% Edited by Daniel Seara at 2017/03/20 02:35 – added min and max radius of gyration criterion
 
 %load([path 'Bead_Tracking\ddposum_files\individual_beads\correspondance'])
 if ispc

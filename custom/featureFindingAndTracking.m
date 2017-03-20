@@ -1,20 +1,28 @@
 % This script runs Maria Kilfoil's Matlab tools for feature finding, particle tracking
 %
-% Requires two structs for feature finding (ffparams) and for tracking (trackparams)
+% Two structs for feature finding (ffparams) and for tracking (trackparams)
 % 
 %     ffparams. 
 %              featsize  = Radius of features in pixels (integer)
 %              barint    = Minimum integrated intensity to be accepted
-%              barrg     = Maximum radius of gyration squared to be accepted in pixels squared
+%              barrg     = Maximum radius of gyration squared to be 
+%                           accepted in pixels squared
 %              barcc     = Maximum eccentricity to be accepted
-%              IdivRg    = Minimum ratio of integrated intensity to radius of gyration squared to be accepted
-%              Imin      = Minimum intensity of local maximum to be considered (set to 0 for default of top 30%)
-%              masscut   = Parameter which defines threshold for integrated intensity before position refinement (optional, set to skip
-%              fovn      = Field of view are you using to optimize feature finding
+%              IdivRg    = Minimum ratio of integrated intensity to radius
+%                           of gyration squared to be accepted
+%              Imin      = Minimum intensity of local maximum to be
+%                           considered (set to 0 for default of top 30%)
+%              masscut   = Parameter which defines threshold for integrated
+%                           intensity before position refinement 
+%                           (optional, set to 0 to skip)
+%              fovn      = Field of view used to optimize feature finding
 %              numframes = Total number of frames
 %              numFOV    = Number of fields of view for the data
-%              frame     = Frame in that fov you are using to optimize (i.e., if fovn = 1 and frame = 3, will look at image fov1_0003.tif)
-%              field     = Enter 0 or 1 if the frame is one field of an interlaced video frame, and 2 if it is a full frame
+%              frame     = Frame in that fov you are using to optimize
+%                           (i.e., if fovn = 1 and frame = 3, will look at
+%                           image fov1_0003.tif)
+%              field     = Enter 0 or 1 if the frame is one field of an
+%                           interlaced video frame, and 2 if it is a full frame
 %
 % trackparams.
 %             featsize   = Same as ffparams.featsize

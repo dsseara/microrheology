@@ -58,10 +58,6 @@ else
     msdy.post=zeros(post_number_of_frames-1,1);
 end
 
-if isempty(rg_cutoff)
-    rg_cutoff = max(correspondance(:,4)) + 1;
-end
-
 beadcount = 0;
 
 for i = 1:length(correspondance(:,1))
@@ -77,7 +73,7 @@ for i = 1:length(correspondance(:,1))
         load([path 'Bead_Tracking/ddposum_files/individual_beads/bead_' num2str(i)]);
     end
     
-    if correspondance(i,4) < rg_cutoff
+    if correspondance(i,4) < rg_cutoff(2) && correspondance(i,4)>rg_cutoff(1)
         if isempty(tc)
             lastframe=length(bsec(:,3));
             bsectauX=zeros(number_of_frames-1,1);

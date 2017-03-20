@@ -3,18 +3,21 @@
 % Calculates the one point microrheology from outputs from
 % Maria Kilfoil's feature finding and tracking algorithms
 %
-% INPUTS   msdparams : struct with parameters to be used in 1 point MSD calculation
+% INPUTS   msdparams : structure
 %
-%          FIELD
-%          timeint     = Time interval between frames in seconds
-%          totalFrames = Total number of frames
-%          rg_cutoff   = Maximum Rg to be included in um ([] for all)
-%          maxtime     = Maximum time to be output in logarithmically spaced msd and tau ([] for all time)
-%          tc          = Critical frame number (optional, pass [] for entire series)
-%          tcFraction  = What fraction of tc to cut data as before and after
-%          numFOV      = Number of fields of view
-%          dedriftBool = true to dedrift, false to not
-%          smoo        = If dedriftBool, number of frames to average drift over
+%
+%       msdparams.
+%                 timeint     = Time interval between frames in seconds
+%                 totalFrames = Total number of frames
+%                 rg_max      = Maximum Rg to be included in um (Inf for no max)
+%                 rg_min      = Minimum Rg to be included in um (0 for no min)
+%                 maxtime     = Maximum time to be output in logarithmically
+%                                spaced msd and tau ([] for all time)
+%                 tc          = Critical frame number (optional, pass [] for all)
+%                 tcFraction  = What fraction of tc to cut data as before and after
+%                 numFOV      = Number of fields of view
+%                 dedriftBool = true to dedrift, false to not
+%                 smoo        = If dedriftBool, number of frames to average drift over
 %
 % OUTPUTS  msdtau  : Logarithmically spaced msd and lag times
 %
@@ -28,6 +31,9 @@ cd(basepath);
 
 if isempty(msdparams.maxtime)
     msdparams.maxtime = msdparams.totalFrames * msdparams.timeint;
+end
+if ~isfield(msdparams,'number_of_frames')
+    msdparams.number_of_frames = msdparams.totalFrames;
 end
 
 converted = 0;
@@ -66,14 +72,13 @@ disp('Done.');
 tc = floor(msdparams.tcFraction*msdparams.tc);
 
 disp('Calculating MSD and taus')
-[msd, msdx, msdy, tau, beadcount] = Mean_SD_many_single_beads(basepath, msdparams.timeint, msdparams.number_of_frames, msdparams.rg_cutoff, tc);
+[msd, msdx, msdy, tau, beadcount] = Mean_SD_many_single_beads(basepath, msdparams.timeint, msdparams.number_of_frames, [msdparams.rg_min, msdparams.rg_max], tc);
 disp('Done.');
 
 % if sum(~isnan(MSD))==0
 %     error('Got all NaNs for MSD');
 % end
 
-%%
 % Now space MSD out logarithmically with ~16 points per decade
 disp('Spacing MSD logarithmically...')
 if isempty(msdparams.tc)

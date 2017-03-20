@@ -11,7 +11,7 @@ function alpha2 = nonGaussian(basepath, msd, tau)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Preallocate memory and parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     preLength = length(msd.pre);
-    pre_pointtraer=zeros(preLength,1);
+    pre_pointtracer=zeros(preLength,1);
     mfd.pre=zeros(preLength,1); % Mean "fourth" displacement, <(delta x)^4>
     
     postLength = length(msd.post);

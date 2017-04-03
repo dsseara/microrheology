@@ -1,4 +1,4 @@
-% This script gives a histogram of the displacements at the tau that maximizes
+% This function gives histograms of the displacements at the tau that maximizes
 % the non-Gaussian parameter found from nonGaussian.m at times before the cutoff
 %
 % alpha2(tau) = <dr^4>/((2) <dr^2>^2) - 1
@@ -16,20 +16,20 @@
 %                     i.e. alpha2.pre
 %         rg_cutoff : [min max] of radius of gyration to use (same as for msd)
 %
-% OUTPUTS         p : List of all displacements of all particles at the tau the maximizes alpha2
+% OUTPUTS         p : Struct of displacements, cartesian (x, y, and combined), radial, and angular
 %
 % Created by Daniel Seara at 2017/03/15 18:44
 
-function [p, histInfo] = displacementDistribution(basepath, tau, alpha2, rg_cutoff)
+function p = displacementDistribution(basepath, tau, alpha2, rg_cutoff)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Preallocate memory and parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     preLength = length(tau);
     [~,maxFrame] = max(alpha2);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if ispc
-        load([basepath 'Bead_Tracking\ddposum_files\individual_beads\correspondance_RG'])
+        load([basepath 'Bead_Tracking\ddposum_files\individual_beads\correspondance_rg.mat'])
     elseif isunix
-        load([basepath 'Bead_Tracking/ddposum_files/individual_beads/correspondance_RG'])
+        load([basepath 'Bead_Tracking/ddposum_files/individual_beads/correspondance_rg.mat'])
     end
 
     p.x = [];
@@ -72,29 +72,11 @@ function [p, histInfo] = displacementDistribution(basepath, tau, alpha2, rg_cuto
     end % end loop over beads
 
 p.all = [p.x;p.y];
-
-% Plot the cartesian displacements
-[histInfo.cart.text, histInfo.cart.N, histInfo.cart.X] = nhist(p);
-saveas(gcf, 'cartesian.tif')
-saveas(gcf, 'cartesian.fig')
-saveas(gcf, 'cartesian.svg')
-
 p.r = sqrt((p.x).^2 + (p.y).^2);
 p.theta = atan2(p.y,p.x);
 
-% Plot the radial displacements
-figure
-[histInfo.r.Text, histInfo.r.N, histInfo.r.X] = nhist(p.r,'pdf');
-saveas(gcf, 'radial.tif')
-saveas(gcf, 'radial.fig')
-saveas(gcf, 'radial.svg')
+save('dispData.mat', 'p')
 
-% Plot an angular histogram
-figure
-[histInfo.theta.tout, histInfo.theta.rout] = rose(p.theta);
-polar(histInfo.theta.tout, histInfo.theta.rout)
-saveas(gcf, 'theta.tif')
-saveas(gcf, 'theta.fig')
-saveas(gcf, 'theta.svg')
+
 
 
